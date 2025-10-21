@@ -1,51 +1,50 @@
-const pool = require('../config/database');
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
+const { signupSchema } = require('../utils/validation');
 
 class AdminController {
-  // POST /v1/admin/invites - Create new invite
-  static async createInvite(req, res) {
+  // Create users based on role
+  static async createUser(req, res) {
     try {
-      const { email, role } = req.body;
-      const query = `
-        INSERT INTO invites (email, role, created_at, expires_at)
-        VALUES ($1, $2, NOW(), NOW() + INTERVAL '7 days')
-        RETURNING id, email, role, created_at, expires_at
-      `;
-      const result = await pool.query(query, [email, role]);
-      res.status(201).json(result.rows[0]);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  // GET /v1/admin/invites - List all invites
-  static async getInvites(req, res) {
-    try {
-      const query = 'SELECT id, email, role, created_at, expires_at, revoked_at FROM invites ORDER BY created_at DESC';
-      const result = await pool.query(query);
-      res.json(result.rows);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  // PATCH /v1/admin/invites/:id/revoke - Revoke specific invite
-  static async revokeInvite(req, res) {
-    try {
-      const { id } = req.params;
-      const query = `
-        UPDATE invites 
-        SET revoked_at = NOW() 
-        WHERE id = $1 AND revoked_at IS NULL
-        RETURNING id, email, role, revoked_at
-      `;
-      const result = await pool.query(query, [id]);
-      
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Invite not found or already revoked' });
+      const { error, value } = signupSchema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
       }
-      
-      res.json(result.rows[0]);
+
+      const { name, email, password, role } = value;
+      const requesterRole = req.user.role;
+
+      // Role validation
+      const allowedCreations = {
+        'PlatformAdmin': ['ClinicAdmin'],
+        'ClinicAdmin': ['Doctor']
+      };
+
+      if (!allowedCreations[requesterRole]?.includes(role)) {
+        return res.status(403).json({ 
+          error: `${requesterRole} can only create: ${allowedCreations[requesterRole]?.join(', ') || 'none'}` 
+        });
+      }
+
+      // Check if user already exists
+      const existingUser = await User.findByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({ error: 'Email already registered' });
+      }
+
+      // Create user
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const newUser = await User.create({ name, email, password: hashedPassword, role });
+
+      res.status(201).json({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        created_at: newUser.created_at
+      });
     } catch (error) {
+      console.error('Create user error:', error);
       res.status(500).json({ error: error.message });
     }
   }

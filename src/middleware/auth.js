@@ -3,15 +3,19 @@ const { verifyToken } = require('../utils/jwt');
 const authenticate = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || '';
+    console.log('Auth header:', authHeader);
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    console.log('Token:', token ? 'Present' : 'Missing');
     if (!token) {
       return res.status(401).json({ success: false, message: 'Missing Authorization token' });
     }
     const decoded = verifyToken(token);
+    console.log('Decoded token:', decoded);
     req.user = decoded;
     return next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    console.error('Auth error:', error.message);
+    return res.status(401).json({ success: false, message: 'Invalid or expired token', error: error.message });
   }
 };
 

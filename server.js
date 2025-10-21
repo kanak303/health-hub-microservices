@@ -17,8 +17,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1', routes);
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'HealthHub Auth Service' });
+app.get('/health', async (req, res) => {
+  try {
+    const pool = require('./src/config/database');
+    await pool.query('SELECT 1');
+    res.json({ status: 'OK', service: 'HealthHub Auth Service', database: 'Connected' });
+  } catch (error) {
+    res.status(500).json({ status: 'ERROR', service: 'HealthHub Auth Service', database: error.message });
+  }
 });
 
 app.use(errorHandler);

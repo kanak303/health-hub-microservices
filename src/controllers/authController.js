@@ -66,8 +66,11 @@ module.exports = {
   signup,
   login: async (req, res) => {
     try {
+      console.log('Login attempt:', req.body);
+      
       const { error, value } = loginSchema.validate(req.body);
       if (error) {
+        console.log('Validation error:', error.details);
         return res.status(400).json({
           success: false,
           message: 'Validation error',
@@ -76,8 +79,11 @@ module.exports = {
       }
 
       const { email, password } = value;
+      console.log('Looking for user:', email);
 
       const user = await User.findByEmail(email);
+      console.log('User found:', user ? 'Yes' : 'No');
+      
       if (!user) {
         return res.status(401).json({
           success: false,
@@ -86,6 +92,8 @@ module.exports = {
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
+      console.log('Password match:', passwordMatch);
+      
       if (!passwordMatch) {
         return res.status(401).json({
           success: false,
@@ -120,7 +128,8 @@ module.exports = {
       console.error('Login error:', error);
       return res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: 'Internal server error',
+        error: error.message
       });
     }
   },
@@ -131,7 +140,7 @@ module.exports = {
         return res.status(400).json({ success: false, message: 'targetEmail and targetRole are required' });
       }
 
-      const requester = req.user; // set by auth middleware
+      const requester = req.user;
 
       // Only PlatformAdmin can impersonate ClinicAdmin
       if (requester.role !== 'PlatformAdmin' || targetRole !== 'ClinicAdmin') {
