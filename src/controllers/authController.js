@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
-const { signupSchema, loginSchema } = require('../utils/validation');
+const { signupSchema, loginSchema, patientSignupSchema } = require('../utils/validation');
 
 const signup = async (req, res) => {
   try {
-    const { error, value } = signupSchema.validate(req.body);
+    const { error, value } = patientSignupSchema.validate(req.body);
     if (error) {
       return res.status(400).json({
         success: false,
@@ -14,7 +14,8 @@ const signup = async (req, res) => {
       });
     }
 
-    const { name, email, password, role } = value;
+    const { name, email, password } = value;
+    const role = 'Patient'; 
 
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
@@ -101,11 +102,11 @@ module.exports = {
         });
       }
 
-      // Restrict login to PlatformAdmin only
-      if (user.role !== 'PlatformAdmin') {
+      // Allow Patient to login
+      if (!['PlatformAdmin', 'Patient'].includes(user.role)) {
         return res.status(403).json({
           success: false,
-          message: 'Only PlatformAdmin is allowed to login'
+          message: 'Only PlatformAdmin and Patient are allowed to login'
         });
       }
 

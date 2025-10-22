@@ -1,10 +1,12 @@
 const express = require('express');
-const { createUser } = require('../controllers/adminController');
+const { createUser, sendInvite } = require('../controllers/adminController');
 const { authenticate, requireRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
-// POST /v1/admin/users 
+// Send invite
+router.post('/invites', authenticate, requireRoles('PlatformAdmin', 'ClinicAdmin'), sendInvite);
+
 router.post('/users', authenticate, requireRoles('PlatformAdmin', 'ClinicAdmin'), createUser);
 
 module.exports = router;
