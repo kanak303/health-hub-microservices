@@ -1,12 +1,12 @@
-const express = require('express');
-const { validateInvite, acceptInvite } = require('../controllers/inviteController');
+import express from 'express';
+import InviteController from '../controllers/inviteController.js';
 
 const router = express.Router();
 
 // Validate invite token
-router.get('/:token', validateInvite);
+router.get('/:token', InviteController.validateInvite);
 
 // Accept invite and create account
-router.post('/:token/accept', acceptInvite);
+router.post('/:token/accept', InviteController.acceptInvite);
 
-module.exports = router;
+export default router;

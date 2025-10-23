@@ -1,7 +1,7 @@
-const bcrypt = require('bcrypt');
-const User = require('../models/User');
-const Invite = require('../models/Invite');
-const { generateToken } = require('../utils/jwt');
+import bcrypt from 'bcrypt';
+import User from '../models/User.js';
+import Invite from '../models/Invite.js';
+import { generateToken } from '../utils/jwt.js';
 
 class InviteController {
   // Validate invite token
@@ -84,4 +84,4 @@ class InviteController {
   }
 }
 
-module.exports = InviteController;
+export default InviteController;

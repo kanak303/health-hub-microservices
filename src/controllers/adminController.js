@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const User = require('../models/User');
-const Invite = require('../models/Invite');
-const { signupSchema } = require('../utils/validation');
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import User from '../models/User.js';
+import Invite from '../models/Invite.js';
+import { signupSchema } from '../utils/validation.js';
 
 class AdminController {
   //Send invite
@@ -103,4 +103,4 @@ class AdminController {
   }
 }
 
-module.exports = AdminController;
+export default AdminController;

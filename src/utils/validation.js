@@ -1,25 +1,19 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
-const signupSchema = Joi.object({
+export const signupSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
   role: Joi.string().valid('PlatformAdmin', 'ClinicAdmin', 'Doctor', 'Patient').required()
 });
 
-const patientSignupSchema = Joi.object({
+export const patientSignupSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required()
 });
 
-const loginSchema = Joi.object({
+export const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required()
 });
-
-module.exports = {
-  signupSchema,
-  loginSchema,
-  patientSignupSchema
-};

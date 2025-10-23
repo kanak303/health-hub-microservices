@@ -1,6 +1,6 @@
-const { verifyToken } = require('../utils/jwt');
+import { verifyToken } from '../utils/jwt.js';
 
-const authenticate = (req, res, next) => {
+export const authenticate = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || '';
     console.log('Auth header:', authHeader);
@@ -19,7 +19,7 @@ const authenticate = (req, res, next) => {
   }
 };
 
-const requireRoles = (...allowedRoles) => (req, res, next) => {
+export const requireRoles = (...allowedRoles) => (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'Unauthorized' });
   }
@@ -27,11 +27,6 @@ const requireRoles = (...allowedRoles) => (req, res, next) => {
     return res.status(403).json({ success: false, message: 'Forbidden: insufficient role' });
   }
   return next();
-};
-
-module.exports = {
-  authenticate,
-  requireRoles
 };
 
 

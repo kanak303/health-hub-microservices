@@ -1,6 +1,6 @@
-const express = require('express');
-const { signup, login, impersonate } = require('../controllers/authController');
-const { authenticate, requireRoles } = require('../middleware/auth');
+import express from 'express';
+import { signup, login, impersonate } from '../controllers/authController.js';
+import { authenticate, requireRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -8,4 +8,4 @@ router.post('/signup', signup);
 router.post('/login', login);
 router.post('/impersonate', authenticate, requireRoles('PlatformAdmin'), impersonate);
 
-module.exports = router;
+export default router;

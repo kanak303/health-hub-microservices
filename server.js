@@ -1,8 +1,11 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const routes = require('./src/routes');
-const errorHandler = require('./src/middleware/errorHandler');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import routes from './src/routes/index.js';
+import errorHandler from './src/middleware/errorHandler.js';
+import pool from './src/config/database.js';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,7 +22,6 @@ app.use('/api/v1', routes);
 
 app.get('/health', async (req, res) => {
   try {
-    const pool = require('./src/config/database');
     await pool.query('SELECT 1');
     res.json({ status: 'OK', service: 'HealthHub Auth Service', database: 'Connected' });
   } catch (error) {

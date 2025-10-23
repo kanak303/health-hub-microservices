@@ -1,4 +1,4 @@
-const pool = require('../config/database');
+import pool from '../config/database.js';
 
 class Invite {
   static async create(inviteData) {
@@ -31,4 +31,4 @@ class Invite {
   }
 }
 
-module.exports = Invite;
+export default Invite;

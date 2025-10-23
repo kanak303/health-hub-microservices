@@ -1,12 +1,12 @@
-const express = require('express');
-const { createUser, sendInvite } = require('../controllers/adminController');
-const { authenticate, requireRoles } = require('../middleware/auth');
+import express from 'express';
+import AdminController from '../controllers/adminController.js';
+import { authenticate, requireRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Send invite
-router.post('/invites', authenticate, requireRoles('PlatformAdmin', 'ClinicAdmin'), sendInvite);
+router.post('/invites', authenticate, requireRoles('PlatformAdmin', 'ClinicAdmin'), AdminController.sendInvite);
 
-router.post('/users', authenticate, requireRoles('PlatformAdmin', 'ClinicAdmin'), createUser);
+router.post('/users', authenticate, requireRoles('PlatformAdmin', 'ClinicAdmin'), AdminController.createUser);
 
-module.exports = router;
+export default router;
