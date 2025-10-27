@@ -13,7 +13,7 @@ class Config {
 
   static async getByKey(key) {
     const result = await pool.query('SELECT * FROM global_configs WHERE key = $1', [key]);
-    return result.rows[0];
+    return result.rows.length > 0 ? result.rows[0] : null;
   }
 
   static async create(configData) {
